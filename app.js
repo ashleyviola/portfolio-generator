@@ -1,28 +1,11 @@
 const inquirer = require('inquirer');
 const { findLastKey } = require('lodash');
 
+const fs = require('fs');
+const generatePage = require('./src/page-template');
 
 const promptUser = () => {
-
     return inquirer.prompt([
-        {
-            type: 'confirm',
-            name: 'confirmAbout',
-            message: 'Would you like to enter information about yourself for an "About" section?',
-            default: true
-        },
-        {
-            type: 'input',
-            name: 'about',
-            message: 'Provide information about yourself:',
-            when: ({confirmAbout}) => {
-                if(confirmAbout){
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        },
         {
             type: 'input',
             name: 'name',
@@ -53,6 +36,18 @@ const promptUser = () => {
             type: 'input',
             name: 'about',
             message: 'Provide some information about yourself'
+        },
+        {
+            type: 'confirm',
+            name: 'confirmAbout',
+            message: 'Would you like to enter information about yourself for an "About" section?',
+            default: true
+        },
+        {
+            type: 'input',
+            name: 'about',
+            message: 'Provide information about yourself:',
+            when: ({confirmAbout}) => confirmAbout
         }
     ]);
 };
@@ -140,16 +135,14 @@ const promptProject = portfoilioData => {
 promptUser()
     .then(promptProject)
     .then(portfoilioData => {
-        console.log(portfoilioData);
+        const pageHTML = generatePage(portfoilioData);
+
+        fs.writeFile('index.html',generatePage(portfoilioData), err => {
+            if (err) throw new Error(err);
+
+            console.log('Portfolio Complete! Check out index.html to see the output!');
+        });
     });
 
 
-// const fs = require('fs');
-// const generatePage = require('./src/page-template');
-// const [name, github] = profileDataArgs;
 
-// fs.writeFile('index.html',generatePage(name,github), err => {
-//     if (err) throw new Error(err);
-
-//     console.log('Portfolio Complete! Check out index.html to see the output!');
-// });
