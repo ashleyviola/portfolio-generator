@@ -3,6 +3,8 @@ const { findLastKey } = require('lodash');
 
 const fs = require('fs');
 const generatePage = require('./src/page-template');
+const {writeFile, copyFile} = require('./utils/generate-site.js');
+
 
 const promptUser = () => {
     return inquirer.prompt([
@@ -135,13 +137,20 @@ const promptProject = portfoilioData => {
 promptUser()
     .then(promptProject)
     .then(portfoilioData => {
-        const pageHTML = generatePage(portfoilioData);
-
-        fs.writeFile('index.html',generatePage(portfoilioData), err => {
-            if (err) throw new Error(err);
-
-            console.log('Portfolio Complete! Check out index.html to see the output!');
-        });
+        return generatePage(portfoilioData);
+    })
+    .then(pageHTML => {
+        return writeFile(pageHTML);
+    })
+    .then(writeFileResponse => {
+        console.log(writeFileResponse);
+        return copyFile();
+    })
+    .then(copyFileResponse => {
+        console.log(copyFileResponse);
+    })
+    .catch(err => {
+        console.log(err);
     });
 
 
